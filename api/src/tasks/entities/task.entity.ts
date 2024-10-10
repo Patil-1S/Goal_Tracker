@@ -17,13 +17,8 @@ export class Task extends BaseEntity {
   time: Date;
 
   @Column()
-  status: TodoStatus;
+  status: string;
 
   @ManyToOne(() => User, (user) => user.tasks)
   user: User;
-}
-
-export enum TodoStatus {
-  InProgress = 'InProgress',
-  COMPLETED = 'COMPLETED',
 }
