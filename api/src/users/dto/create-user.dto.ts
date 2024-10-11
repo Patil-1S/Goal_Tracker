@@ -3,19 +3,17 @@ import {
   IsEmail,
   IsMobilePhone,
   IsEnum,
-  IsArray,
   IsNotEmpty,
   MinLength,
-  MaxLength,
 } from 'class-validator';
 
 export class CreateUserDto {
   @IsString()
-  @IsNotEmpty()
+  @IsNotEmpty({ message: 'Name can not be empty.' })
   name: string;
 
   @IsMobilePhone()
-  @IsNotEmpty()
+  @IsNotEmpty({ message: 'Mobile cannot be empty.' })
   mobile: number;
 
   @IsEnum(['Male', 'Female', 'Other'])
@@ -24,16 +22,15 @@ export class CreateUserDto {
   @IsString()
   country: string;
 
-  @IsArray()
-  hobbies: string[];
+  @IsString()
+  hobbies: string;
 
-  @IsEmail()
-  @IsNotEmpty()
+  @IsEmail({}, { message: 'Invalid email format.' })
+  @IsNotEmpty({ message: 'Email cannot be empty.' })
   email: string;
 
   @IsString()
-  @IsNotEmpty()
-  @MinLength(8)
-  @MaxLength(15)
+  @IsNotEmpty({ message: 'Password cannot be empty.' })
+  @MinLength(8, { message: 'Password must be at least 8 characters long.' })
   password: string;
 }

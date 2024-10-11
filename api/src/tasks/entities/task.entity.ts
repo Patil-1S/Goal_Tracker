@@ -14,7 +14,7 @@ export class Task extends BaseEntity {
   description: string;
 
   @Column({ type: 'timestamp' })
-  time: Date;
+  time: string;
 
   @Column()
   status: string;

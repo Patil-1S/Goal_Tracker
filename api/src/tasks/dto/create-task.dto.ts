@@ -9,7 +9,7 @@ export class CreateTaskDto {
   description: string;
 
   @IsString()
-  time: Date;
+  time: string;
 
   @IsEnum(['in progress', 'completed'])
   status: string;

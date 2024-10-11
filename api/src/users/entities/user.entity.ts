@@ -19,8 +19,8 @@ export class User extends BaseEntity {
   @Column()
   country: string;
 
-  @Column({ type: 'text' })
-  hobbies: string[];
+  @Column()
+  hobbies: string;
 
   @Column({ unique: true })
   email: string;
