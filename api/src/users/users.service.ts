@@ -1,11 +1,15 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
 import { LoginDto } from './dto/login.dto';
-import { error } from 'console';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UsersService {
@@ -15,18 +19,25 @@ export class UsersService {
   ) {}
 
   async create(createUserDto: CreateUserDto): Promise<User> {
-    const user = this.userRepository.create(createUserDto);
+    const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
+    const user = this.userRepository.create({
+      ...createUserDto,
+      password: hashedPassword,
+    });
     return this.userRepository.save(user);
   }
 
   async findAll(): Promise<User[]> {
-    const response = await this.userRepository.find();
-    return response;
+    const user = await this.userRepository.find();
+    return user;
   }
 
   async findOne(id: string): Promise<User> {
-    const response = await this.userRepository.findOneBy({ id });
-    return response;
+    const user = await this.userRepository.findOneBy({ id });
+    if (!user) {
+      throw new NotFoundException(`User with ID ${id} not found`);
+    }
+    return user;
   }
 
   async update(id: string, updateUserDto: UpdateUserDto): Promise<User> {
@@ -45,15 +56,22 @@ export class UsersService {
     }
   }
 
-  async login(loginDto: LoginDto): Promise<void> {
+  async login(loginDto: LoginDto) {
     const { mobile, password } = loginDto;
 
     const user = await this.userRepository.findOne({
-      where: { mobile, password },
+      where: { mobile },
     });
 
     if (!user) {
-      throw new error('Invalid credentials');
+      throw new BadRequestException('Invalid credentials');
     }
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+
+    if (!isPasswordValid) {
+      throw new BadRequestException('Invalid credentials');
+    }
+
+    return user;
   }
 }

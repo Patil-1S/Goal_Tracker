@@ -1,10 +1,10 @@
 import {
   IsString,
   IsEmail,
-  IsMobilePhone,
   IsEnum,
   IsNotEmpty,
   MinLength,
+  IsPhoneNumber,
 } from 'class-validator';
 
 export class CreateUserDto {
@@ -12,9 +12,9 @@ export class CreateUserDto {
   @IsNotEmpty({ message: 'Name can not be empty.' })
   name: string;
 
-  @IsMobilePhone()
+  @IsPhoneNumber()
   @IsNotEmpty({ message: 'Mobile cannot be empty.' })
-  mobile: number;
+  mobile: string;
 
   @IsEnum(['Male', 'Female', 'Other'])
   gender: string;

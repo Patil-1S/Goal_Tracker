@@ -6,6 +6,7 @@ import {
   Patch,
   Param,
   Delete,
+  Query,
 } from '@nestjs/common';
 import { TasksService } from './tasks.service';
 import { CreateTaskDto } from './dto/create-task.dto';
@@ -20,9 +21,14 @@ export class TasksController {
     return this.tasksService.create(createTaskDto);
   }
 
+  // @Get()
+  // findAll() {
+  //   return this.tasksService.findAll();
+  // }
+
   @Get()
-  findAll() {
-    return this.tasksService.findAll();
+  async findAll(@Query('page') page: number, @Query('limit') limit: number) {
+    return this.tasksService.findAll(page | 1, limit | 10);
   }
 
   @Get(':id')

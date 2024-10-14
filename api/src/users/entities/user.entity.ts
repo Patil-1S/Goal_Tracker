@@ -11,7 +11,7 @@ export class User extends BaseEntity {
   name: string;
 
   @Column()
-  mobile: number;
+  mobile: string;
 
   @Column()
   gender: string;

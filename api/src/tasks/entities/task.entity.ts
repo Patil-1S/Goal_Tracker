@@ -2,11 +2,8 @@ import { Entity, Column, ManyToOne } from 'typeorm';
 import { User } from '../../users/entities/user.entity';
 import { BaseEntity } from '../../base-model/entities/base-model.entity';
 
-@Entity()
+@Entity({ name: 'tasks' })
 export class Task extends BaseEntity {
-  //   @PrimaryGeneratedColumn()
-  //   id: UUID;
-
   @Column()
   name: string;
 
@@ -14,7 +11,7 @@ export class Task extends BaseEntity {
   description: string;
 
   @Column({ type: 'timestamp' })
-  time: string;
+  time: Date;
 
   @Column()
   status: string;

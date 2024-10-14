@@ -1,11 +1,10 @@
-import { IsMobilePhone, IsString, IsNotEmpty } from 'class-validator';
+import { IsString, IsNotEmpty } from 'class-validator';
 
 export class LoginDto {
-  @IsMobilePhone()
-  @IsNotEmpty()
-  mobile: number;
+  @IsNotEmpty({ message: 'Mobile can not be empty.' })
+  mobile: string;
 
-  @IsNotEmpty()
+  @IsNotEmpty({ message: 'Password can not be empty.' })
   @IsString()
   password: string;
 }

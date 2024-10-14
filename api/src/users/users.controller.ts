@@ -13,6 +13,7 @@ import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { LoginDto } from './dto/login.dto';
+import { User } from './entities/user.entity';
 
 @Controller('users')
 export class UsersController {
@@ -20,33 +21,36 @@ export class UsersController {
 
   @Post()
   @UsePipes(new ValidationPipe())
-  create(@Body() createUserDto: CreateUserDto) {
+  async create(@Body() createUserDto: CreateUserDto): Promise<User> {
     return this.usersService.create(createUserDto);
   }
 
   @Get()
-  findAll() {
+  async findAll(): Promise<User[]> {
     return this.usersService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  async findOne(@Param('id') id: string): Promise<User> {
     return this.usersService.findOne(id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
+  async update(
+    @Param('id') id: string,
+    @Body() updateUserDto: UpdateUserDto,
+  ): Promise<User> {
     return this.usersService.update(id, updateUserDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
+  async remove(@Param('id') id: string): Promise<void> {
     return this.usersService.remove(id);
   }
 
   @Post('login')
   @UsePipes(new ValidationPipe())
-  login(@Body() loginDto: LoginDto) {
+  async login(@Body() loginDto: LoginDto): Promise<User> {
     return this.usersService.login(loginDto);
   }
 }
