@@ -19,10 +19,10 @@ export class CreateUserDto {
   @IsEnum(['Male', 'Female', 'Other'])
   gender: string;
 
-  @IsString()
+  @IsEnum(['India', 'SriLanka', 'Japan'])
   country: string;
 
-  @IsString()
+  @IsEnum(['Music', 'Sports', 'Painting'])
   hobbies: string;
 
   @IsEmail({}, { message: 'Invalid email format.' })

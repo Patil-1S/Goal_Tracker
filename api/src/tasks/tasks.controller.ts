@@ -27,8 +27,15 @@ export class TasksController {
   // }
 
   @Get()
-  async findAll(@Query('page') page: number, @Query('limit') limit: number) {
-    return this.tasksService.findAll(page | 1, limit | 10);
+  // async findAll(@Query('page') page: number, @Query('limit') limit: number) {
+  //   return this.tasksService.findAll(page | 1, limit | 10);
+  // }
+  async findAll(
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 10,
+    @Query('status') status?: 'in progress' | 'completed',
+  ) {
+    return this.tasksService.findAll(page | 1, limit | 10, status);
   }
 
   @Get(':id')
