@@ -1,6 +1,7 @@
 "use client";
 
 import { useForm, SubmitHandler } from "react-hook-form";
+import { useRouter } from "next/navigation";
 
 interface ITaskInput {
   name: string;
@@ -16,8 +17,27 @@ export default function CreateTask() {
     formState: { errors },
   } = useForm<ITaskInput>();
 
-  const onSubmit: SubmitHandler<ITaskInput> = (data) => {
-    console.log(data);
+  const router = useRouter();
+  const onSubmit: SubmitHandler<ITaskInput> = async (data) => {
+    try {
+      const response = await fetch("http://localhost:3000/api/src/tasks", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to create task");
+      }
+
+      const result = await response.json();
+      console.log("Task created successfully:", result.data);
+      router.push("/taskslist");
+    } catch (error) {
+      console.error("Error creating task:", error);
+    }
   };
 
   return (
