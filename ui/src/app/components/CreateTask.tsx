@@ -20,7 +20,7 @@ export default function CreateTask() {
   const router = useRouter();
   const onSubmit: SubmitHandler<ITaskInput> = async (data) => {
     try {
-      const response = await fetch("http://localhost:3000/api/src/tasks", {
+      const response = await fetch("http://localhost:3000/tasks", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -34,7 +34,7 @@ export default function CreateTask() {
 
       const result = await response.json();
       console.log("Task created successfully:", result.data);
-      router.push("/taskslist");
+      router.push("/tasklist");
     } catch (error) {
       console.error("Error creating task:", error);
     }

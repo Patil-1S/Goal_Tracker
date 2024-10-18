@@ -32,7 +32,7 @@ export default function LoginForm() {
   const onLogin = async () => {
     try {
       const response = await axios.post(
-        "http://localhost:3000/api/src/users",
+        "http://localhost:3000/users/login",
         user
       );
       console.log("Login success", response.data);

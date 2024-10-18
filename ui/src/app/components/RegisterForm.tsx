@@ -1,16 +1,15 @@
 "use client";
 
-import { useForm, SubmitHandler } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import Link from "next/link";
 import React, { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 
-
 enum GenderEnum {
-  female = "female",
-  male = "male",
-  other = "other",
+  female = "Female",
+  male = "Male",
+  other = "Other",
 }
 
 enum CountryEnum {
@@ -37,18 +36,13 @@ interface IFormInput {
 
 const RegisterForm: React.FC = () => {
   const { register, handleSubmit } = useForm<IFormInput>();
-
-  const onSubmit: SubmitHandler<IFormInput> = (data) => {
-    console.log(data);
-  };
-
   const router = useRouter();
   const [user, setUser] = React.useState({
     name: "",
     mobile: "",
-    country:"",
-    gender:"",
-    hobbies:"",
+    country: "",
+    gender: "",
+    hobbies: "",
     email: "",
     password: "",
   });
@@ -56,112 +50,127 @@ const RegisterForm: React.FC = () => {
 
   const onRegister = async () => {
     try {
-      const response = await axios.post("http://localhost:3000/api/src/users", user);
+      const response = await axios.post("http://localhost:3000/users", user);
       console.log("Register success", response.data);
       router.push("/login");
     } catch (error) {
       console.log("Register failed", error);
-    } 
+    }
   };
 
   useEffect(() => {
-    if (
-      user.mobile.length > 0 &&
-      user.email.length > 0 &&
-      user.password.length > 0 &&
-      user.name.length > 0
-    ) {
-      setButtonDisabled(false);
-    } else {
-      setButtonDisabled(true);
-    }
+    setButtonDisabled(
+      !user.mobile || !user.email || !user.password || !user.name
+    );
   }, [user]);
+
   return (
-    <div className="grid place-items-center h-screen">
-      <div className="shadow-lg p-5 rounded-lg border-t-4 border-green-500">
-        <h1 className="text-xl font-bold my-4">Register</h1>
-        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-2">
-          <label>Name</label>
+    <div className="flex items-center justify-center min-h-screen bg-gray-100">
+      <div className="shadow-lg p-6 rounded-lg border-t-4 border-green-500 bg-white w-full max-w-md">
+        <h1 className="text-2xl font-bold text-center mb-6">Register</h1>
+        <form onSubmit={handleSubmit(onRegister)} className="flex flex-col gap-4">
+          <label className="font-semibold">Name</label>
           <input
-            {...register("name", { required: true })}
+            {...register("name", { required: "Name is required" })}
             id="name"
             type="text"
+            className="border rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-500"
             value={user.name}
             onChange={(e) => setUser({ ...user, name: e.target.value })}
           />
 
-          <label>Mobile</label>
+          <label className="font-semibold">Mobile</label>
           <input
-            {...register("mobile", { required: true })}
+            {...register("mobile", { required: "Mobile is required" })}
             id="mobile"
             type="text"
+            className="border rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-500"
             value={user.mobile}
             onChange={(e) => setUser({ ...user, mobile: e.target.value })}
           />
 
-          {/* <label>Country Selection</label> */}
+          <label className="font-semibold">Country</label>
           <select
             {...register("country", { required: true })}
             id="country"
+            className="border rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-500"
             value={user.country}
             onChange={(e) => setUser({ ...user, country: e.target.value })}
           >
-            <option value="">Select a country</option>
+            <option value="">Select Country</option>
             <option value={CountryEnum.India}>{CountryEnum.India}</option>
             <option value={CountryEnum.Japan}>{CountryEnum.Japan}</option>
             <option value={CountryEnum.SriLanka}>{CountryEnum.SriLanka}</option>
           </select>
 
-          {/* <label>Gender Selection</label> */}
+          <label className="font-semibold">Gender</label>
           <select
             {...register("gender", { required: true })}
             id="gender"
+            className="border rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-500"
             value={user.gender}
             onChange={(e) => setUser({ ...user, gender: e.target.value })}
           >
-            <option value="">Select gender</option>
+            <option value="">Select Gender</option>
             <option value={GenderEnum.female}>{GenderEnum.female}</option>
             <option value={GenderEnum.male}>{GenderEnum.male}</option>
             <option value={GenderEnum.other}>{GenderEnum.other}</option>
           </select>
 
-          {/* <label>Hobbies Selection</label> */}
+          <label className="font-semibold">Hobbies</label>
           <select
             {...register("hobbies", { required: true })}
             id="hobbies"
+            className="border rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-500"
             value={user.hobbies}
             onChange={(e) => setUser({ ...user, hobbies: e.target.value })}
           >
-            <option value="">Select hobbies</option>
+            <option value="">Select Hobbies</option>
             <option value={HobbiesEnum.Sports}>{HobbiesEnum.Sports}</option>
             <option value={HobbiesEnum.Music}>{HobbiesEnum.Music}</option>
             <option value={HobbiesEnum.Painting}>{HobbiesEnum.Painting}</option>
           </select>
 
-          <label>Email</label>
+          <label className="font-semibold">Email</label>
           <input
-            {...register("email", { required: true })}
+            {...register("email", {
+              required: "Email is required",
+              pattern: { value: /^\S+@\S+$/i, message: "Invalid email format" },
+            })}
             id="email"
             type="text"
+            className="border rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-500"
             value={user.email}
             onChange={(e) => setUser({ ...user, email: e.target.value })}
           />
 
-          <label>Password</label>
+          <label className="font-semibold">Password</label>
           <input
-            {...register("password", { required: true })}
+            {...register("password", {
+              required: "Password is required",
+              minLength: {
+                value: 8,
+                message: "Password must be at least 8 characters",
+              },
+            })}
             id="password"
             type="password"
+            className="border rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-500"
             value={user.password}
             onChange={(e) => setUser({ ...user, password: e.target.value })}
           />
 
-          <button onClick={onRegister} 
-          className="bg-green-600 text-white font-bold cursor-pointer px-6 py-2">
-            {buttonDisabled ? "No signup" : "Register"}
+          <button
+            type="submit"
+            className={`mt-4 bg-green-600 text-white font-bold py-2 rounded ${
+              buttonDisabled ? "opacity-50 cursor-not-allowed" : "hover:bg-green-700"
+            }`}
+            disabled={buttonDisabled}
+          >
+            {buttonDisabled ? "Please fill all fields" : "Register"}
           </button>
 
-          <Link className="text-sm mt-3 text-right" href={"/login"}>
+          <Link className="text-sm text-blue-600 hover:underline mt-2" href="/login">
             Already have an account? <span className="underline">Login</span>
           </Link>
         </form>
