@@ -53,4 +53,11 @@ export class UsersController {
   async login(@Body() loginDto: LoginDto): Promise<User> {
     return this.usersService.login(loginDto);
   }
+
+  @Post('logout')
+  async logout(req) {
+    // Invalidate user session or token if needed
+    req.logout(); // Use if you're using a session-based approach
+    return { message: 'Logged out successfully' };
+  }
 }

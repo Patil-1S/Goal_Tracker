@@ -21,21 +21,13 @@ export class TasksController {
     return this.tasksService.create(createTaskDto);
   }
 
-  // @Get()
-  // findAll() {
-  //   return this.tasksService.findAll();
-  // }
-
   @Get()
-  // async findAll(@Query('page') page: number, @Query('limit') limit: number) {
-  //   return this.tasksService.findAll(page | 1, limit | 10);
-  // }
   async findAll(
     @Query('page') page: number = 1,
-    @Query('limit') limit: number = 10,
-    @Query('status') status?: 'in progress' | 'completed',
+    @Query('limit') limit: number = 5,
+    @Query('status') status?: 'in progress' | 'completed' | 'None',
   ) {
-    return this.tasksService.findAll(page | 1, limit | 10, status);
+    return this.tasksService.findAll(page, limit, status);
   }
 
   @Get(':id')

@@ -17,27 +17,28 @@ export class TasksService {
     return this.taskRepository.save(task);
   }
 
-  // async findAll(page: number = 1, limit: number = 10): Promise<Task[]> {
-  //   return this.taskRepository.find({
-  //     skip: (page - 1) * limit,
-  //     take: limit,
-  //   });
-  // }
   async findAll(
     page: number = 1,
     limit: number = 10,
-    status?: 'in progress' | 'completed',
-  ): Promise<Task[]> {
+    status?: 'in progress' | 'completed' | 'None',
+  ): Promise<{ count: number; rows: Task[] }> {
     const query = this.taskRepository.createQueryBuilder('task');
 
-    if (status) {
+    if (status !== 'None') {
       query.where('task.status = :status', { status });
     }
+    console.log(limit);
+    console.log(page);
 
-    return query
+    const [rows, totalCount] = await query
       .skip((page - 1) * limit)
       .take(limit)
-      .getMany();
+      .getManyAndCount();
+
+    return {
+      count: totalCount,
+      rows: rows,
+    };
   }
 
   async findOne(id: string): Promise<Task> {

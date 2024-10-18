@@ -41,47 +41,68 @@ export default function CreateTask() {
   };
 
   return (
-    <div className="grid place-items-center h-screen">
-      <div className="shadow-lg p-5 rounded-lg border-t-4 border-green-400">
-        <h1 className="text-xl font-bold my-4">Create New Task</h1>
-        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-3">
-          <input
-            {...register("name", { required: "Task name is required" })}
-            placeholder="Task Name"
-          />
-          {errors.name && (
-            <span className="text-red-500">{errors.name.message}</span>
-          )}
+    <div className="flex items-center justify-center h-screen bg-gray-100">
+      <div className="bg-white shadow-lg rounded-lg p-6 border-t-4 border-green-400 w-96">
+        <h1 className="text-2xl font-semibold text-center mb-4">Create New Task</h1>
+        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
+          <div>
+            <input
+              {...register("name", { required: "Task name is required" })}
+              placeholder="Task Name"
+              className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-400 ${
+                errors.name ? "border-red-500" : "border-gray-300"
+              }`}
+            />
+            {errors.name && (
+              <span className="text-red-500 text-sm">{errors.name.message}</span>
+            )}
+          </div>
 
-          <textarea
-            {...register("description", {
-              required: "Description is required",
-            })}
-            placeholder="Description"
-          />
-          {errors.description && (
-            <span className="text-red-500">{errors.description.message}</span>
-          )}
+          <div>
+            <textarea
+              {...register("description", { required: "Description is required" })}
+              placeholder="Description"
+              className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-400 ${
+                errors.description ? "border-red-500" : "border-gray-300"
+              }`}
+              rows={4}
+            />
+            {errors.description && (
+              <span className="text-red-500 text-sm">{errors.description.message}</span>
+            )}
+          </div>
 
-          <input
-            {...register("time", { required: "Time is required" })}
-            type="datetime-local"
-          />
-          {errors.time && (
-            <span className="text-red-500">{errors.time.message}</span>
-          )}
+          <div>
+            <input
+              {...register("time", { required: "Time is required" })}
+              type="datetime-local"
+              className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-400 ${
+                errors.time ? "border-red-500" : "border-gray-300"
+              }`}
+            />
+            {errors.time && (
+              <span className="text-red-500 text-sm">{errors.time.message}</span>
+            )}
+          </div>
 
-          <select {...register("status", { required: "Status is required" })}>
-            <option value="">Select Status</option>
-            <option value="in progress">In Progress</option>
-            <option value="completed">Completed</option>
-          </select>
-          {errors.status && (
-            <span className="text-red-500">{errors.status.message}</span>
-          )}
+          <div>
+            <select
+              {...register("status", { required: "Status is required" })}
+              className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-400 ${
+                errors.status ? "border-red-500" : "border-gray-300"
+              }`}
+            >
+              <option value="">Select Status</option>
+              <option value="in progress">In Progress</option>
+              <option value="completed">Completed</option>
+            </select>
+            {errors.status && (
+              <span className="text-red-500 text-sm">{errors.status.message}</span>
+            )}
+          </div>
 
           <button
-            className="bg-green-600 text-white font-bold cursor-pointer px-6 py-2"
+            className="bg-green-600 text-white font-bold cursor-pointer px-6 py-2 rounded-md transition duration-300 ease-in-out hover:bg-green-700"
             type="submit"
           >
             Create
