@@ -6,6 +6,7 @@ import React, { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 
+
 interface ILoginFormInput {
   mobile: string;
   password: string;
@@ -29,15 +30,24 @@ export default function LoginForm() {
     try {
       const response = await axios.post(
         "http://localhost:3000/users/login",
-        user
+        user,
+        { withCredentials: true }
       );
+      
       console.log("Login success", response.data);
-      router.push("/createtask");
+  
+      // Store user information in local storage
+      if (response.data.user) {
+        localStorage.setItem("user", JSON.stringify(response.data.user));
+        router.push("/createtask");
+      } else {
+        console.log("User not authenticated");
+      }
     } catch (error) {
       console.log("Login failed", error);
     }
-  };
-
+  };  
+  
   useEffect(() => {
     setButtonDisabled(!(user.mobile && user.password));
   }, [user]);
@@ -61,7 +71,9 @@ export default function LoginForm() {
               }`}
             />
             {errors.mobile && (
-              <span className="text-red-500 text-sm">{errors.mobile.message}</span>
+              <span className="text-red-500 text-sm">
+                {errors.mobile.message}
+              </span>
             )}
           </div>
 
@@ -78,7 +90,9 @@ export default function LoginForm() {
               }`}
             />
             {errors.password && (
-              <span className="text-red-500 text-sm">{errors.password.message}</span>
+              <span className="text-red-500 text-sm">
+                {errors.password.message}
+              </span>
             )}
           </div>
 
@@ -92,9 +106,14 @@ export default function LoginForm() {
             Login
           </button>
 
-          <Link className="text-sm text-center text-gray-600 mt-3" href={"/register"}>
+          <Link
+            className="text-sm text-center text-gray-600 mt-3"
+            href={"/register"}
+          >
             Don&apos;t have an account?{" "}
-            <span className="underline text-green-600 hover:text-green-800">Register</span>
+            <span className="underline text-green-600 hover:text-green-800">
+              Register
+            </span>
           </Link>
         </form>
       </div>

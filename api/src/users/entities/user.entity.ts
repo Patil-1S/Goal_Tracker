@@ -1,6 +1,7 @@
 import { Entity, Column, OneToMany } from 'typeorm';
 import { Task } from '../../tasks/entities/task.entity';
 import { BaseEntity } from '../../base-model/entities/base-model.entity';
+import { Exclude } from 'class-transformer';
 
 @Entity({ name: 'users' })
 export class User extends BaseEntity {
@@ -22,6 +23,7 @@ export class User extends BaseEntity {
   @Column({ unique: true })
   email: string;
 
+  @Exclude()
   @Column()
   password: string;
 

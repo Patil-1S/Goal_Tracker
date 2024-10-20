@@ -1,7 +1,9 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { useRouter } from "next/navigation";
+// import Link from "next/link";
 
 interface ITaskInput {
   name: string;
@@ -18,6 +20,17 @@ export default function CreateTask() {
   } = useForm<ITaskInput>();
 
   const router = useRouter();
+  const [authLoading, setAuthLoading] = useState(true);
+
+  useEffect(() => {
+    const user = localStorage.getItem('user');
+    if (!user) {
+      router.push('/login');
+    } else {
+      setAuthLoading(false); // User is authenticated
+    }
+  }, [router]);
+
   const onSubmit: SubmitHandler<ITaskInput> = async (data) => {
     try {
       const response = await fetch("http://localhost:3000/tasks", {
@@ -39,6 +52,11 @@ export default function CreateTask() {
       console.error("Error creating task:", error);
     }
   };
+
+  // Show nothing or a loading indicator while checking authentication
+  if (authLoading) {
+    return <div className="text-center p-5"></div>;
+  }
 
   return (
     <div className="flex items-center justify-center h-screen bg-gray-100">
@@ -110,5 +128,6 @@ export default function CreateTask() {
         </form>
       </div>
     </div>
+
   );
 }

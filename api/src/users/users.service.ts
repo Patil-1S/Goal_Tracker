@@ -10,43 +10,50 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
 import { LoginDto } from './dto/login.dto';
 import * as bcrypt from 'bcrypt';
-
+import { JwtService } from '@nestjs/jwt';
+import { Response } from 'express';
+import { UserResponseDto } from './dto/user-response.dto';
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User)
     private userRepository: Repository<User>,
+    private jwtService: JwtService,
   ) {}
 
-  async create(createUserDto: CreateUserDto): Promise<User> {
+  async create(createUserDto: CreateUserDto): Promise<UserResponseDto> {
     const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
     const user = this.userRepository.create({
       ...createUserDto,
       password: hashedPassword,
     });
-    return this.userRepository.save(user);
+    const savedUser = await this.userRepository.save(user);
+    return new UserResponseDto(savedUser); // Return DTO
   }
 
-  async findAll(): Promise<User[]> {
-    const user = await this.userRepository.find();
-    return user;
+  async findAll(): Promise<UserResponseDto[]> {
+    const users = await this.userRepository.find();
+    return users.map((user) => new UserResponseDto(user)); // Transform each user
   }
 
-  async findOne(id: string): Promise<User> {
+  async findOne(id: string): Promise<UserResponseDto> {
     const user = await this.userRepository.findOneBy({ id });
     if (!user) {
       throw new NotFoundException(`User with ID ${id} not found`);
     }
-    return user;
+    return new UserResponseDto(user); // Return DTO
   }
 
-  async update(id: string, updateUserDto: UpdateUserDto): Promise<User> {
+  async update(
+    id: string,
+    updateUserDto: UpdateUserDto,
+  ): Promise<UserResponseDto> {
     await this.userRepository.update(id, updateUserDto);
     const updatedUser = await this.userRepository.findOneBy({ id });
     if (!updatedUser) {
       throw new NotFoundException(`User with ID ${id} not found`);
     }
-    return updatedUser;
+    return new UserResponseDto(updatedUser); // Return DTO
   }
 
   async remove(id: string): Promise<void> {
@@ -56,7 +63,7 @@ export class UsersService {
     }
   }
 
-  async login(loginDto: LoginDto) {
+  async login(loginDto: LoginDto, res: Response): Promise<void> {
     const { mobile, password } = loginDto;
 
     const user = await this.userRepository.findOne({
@@ -71,7 +78,14 @@ export class UsersService {
     if (!isPasswordValid) {
       throw new BadRequestException('Invalid credentials');
     }
+    const payload = { mobile: user.mobile, sub: user.id };
+    const access_token = this.jwtService.sign(payload);
 
-    return user;
+    res.cookie('access_token', access_token, {
+      httpOnly: true,
+      maxAge: 3600000, // 1 hour
+    });
+
+    res.json({ user: new UserResponseDto(user) }); // Return DTO without password
   }
 }

@@ -27,8 +27,6 @@ export class TasksService {
     if (status !== 'None') {
       query.where('task.status = :status', { status });
     }
-    console.log(limit);
-    console.log(page);
 
     const [rows, totalCount] = await query
       .skip((page - 1) * limit)

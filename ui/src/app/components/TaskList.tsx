@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import axios from "axios";
 
 interface ITask {
   id: string;
@@ -13,16 +14,41 @@ interface ITask {
 
 const ITEMS_PER_PAGE = 5;
 
+const SkeletonLoader = () => (
+  <div className="space-y-4">
+    {Array.from({ length: 5 }).map((_, index) => (
+      <div key={index} className="border border-gray-300 p-4 rounded-lg bg-gray-200 animate-pulse">
+        <div className="h-4 bg-gray-300 rounded mb-2"></div>
+        <div className="h-3 bg-gray-300 rounded mb-1"></div>
+        <div className="h-3 bg-gray-300 rounded mb-1"></div>
+        <div className="h-3 bg-gray-300 rounded mb-1"></div>
+      </div>
+    ))}
+  </div>
+);
+
 export default function TaskList() {
   const [tasks, setTasks] = useState<ITask[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(true);
-  const [status, setStatus] = useState<'None' | 'in progress' | 'completed'>('None');
+  const [authLoading, setAuthLoading] = useState(true);
+  const [status, setStatus] = useState<"None" | "in progress" | "completed">("None");
 
   const router = useRouter();
 
   useEffect(() => {
+    const user = localStorage.getItem('user');
+    if (!user) {
+      router.push('/login');
+    } else {
+      setAuthLoading(false); // User is authenticated
+    }
+  }, [router]);
+
+  useEffect(() => {
+    if (authLoading) return; // Skip API call if still checking authentication
+
     const fetchTasks = async () => {
       setLoading(true);
       try {
@@ -43,24 +69,35 @@ export default function TaskList() {
     };
 
     fetchTasks();
-  }, [currentPage, status]);
+  }, [currentPage, status, authLoading]);
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
   };
 
   const handleLogout = async () => {
-    await router.push("/login");
+    try {
+      await axios.post("http://localhost:3000/users/logout", {}, { withCredentials: true });
+      localStorage.removeItem("user");
+      router.push("/login");
+    } catch (error) {
+      console.error("Logout failed", error);
+    }
   };
+
+  // Show nothing or a loading indicator while checking authentication
+  if (authLoading) {
+    return <div className="text-center p-5"></div>;
+  }
 
   return (
     <div className="p-5 bg-gray-100 min-h-screen">
       <h1 className="text-2xl font-bold mb-4 text-center">Task List</h1>
-      
+
       <div className="mb-4 flex justify-center">
         <select
           value={status}
-          onChange={(e) => setStatus(e.target.value as 'None' | 'in progress' | 'completed')}
+          onChange={(e) => setStatus(e.target.value as "None" | "in progress" | "completed")}
           className="border border-gray-300 p-2 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500"
         >
           <option value="None">All</option>
@@ -70,12 +107,15 @@ export default function TaskList() {
       </div>
 
       {loading ? (
-        <p className="text-center">Loading tasks...</p>
+        <SkeletonLoader />
       ) : (
         <ul className="space-y-4">
           {Array.isArray(tasks) && tasks.length > 0 ? (
             tasks.map((task) => (
-              <li key={task.id} className="border border-gray-300 p-4 rounded-lg shadow-md bg-white hover:shadow-lg transition-shadow">
+              <li
+                key={task.id}
+                className="border border-gray-300 p-4 rounded-lg shadow-md bg-white hover:shadow-lg transition-shadow"
+              >
                 <h2 className="text-xl font-semibold">{task.name}</h2>
                 <p className="text-gray-600">{task.description}</p>
                 <p className="text-gray-700">
@@ -91,7 +131,7 @@ export default function TaskList() {
           )}
         </ul>
       )}
-      
+
       <div className="flex justify-center mt-4">
         {Array.from({ length: totalPages }, (_, index) => (
           <button
@@ -107,7 +147,7 @@ export default function TaskList() {
           </button>
         ))}
       </div>
-      
+
       <div className="flex justify-center mt-4">
         <button onClick={handleLogout} className="text-red-600 hover:underline">
           Logout
