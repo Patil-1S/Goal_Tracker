@@ -3,7 +3,8 @@
 import { useEffect, useState } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { useRouter } from "next/navigation";
-// import Link from "next/link";
+import Link from "next/link";
+import axios from "axios";
 
 interface ITaskInput {
   name: string;
@@ -27,7 +28,7 @@ export default function CreateTask() {
     if (!user) {
       router.push('/login');
     } else {
-      setAuthLoading(false); // User is authenticated
+      setAuthLoading(false);
     }
   }, [router]);
 
@@ -53,13 +54,49 @@ export default function CreateTask() {
     }
   };
 
-  // Show nothing or a loading indicator while checking authentication
+  const handleLogout = async () => {
+    try {
+      await axios.post("http://localhost:3000/users/logout", {}, { withCredentials: true });
+      localStorage.removeItem("user");
+      router.push("/login");
+    } catch (error) {
+      console.error("Logout failed", error);
+    }
+  };
+
   if (authLoading) {
     return <div className="text-center p-5"></div>;
   }
 
   return (
-    <div className="flex items-center justify-center h-screen bg-gray-100">
+      <div className="flex">
+      <nav className="w-64 bg-gray-800 text-white h-screen p-4">
+        <h2 className="text-xl font-bold mb-4">Navigation</h2>
+        <ul>
+          <li>
+            <Link
+              href="/tasklist"
+              className="block py-2 hover:bg-gray-500 rounded"
+            >
+            TaskList
+            </Link>
+          </li>
+        </ul>
+        <div className="mt-auto">
+        <button onClick={handleLogout} className="text-red-600 block py-2 hover:bg-gray-700 rounded">
+          Logout
+        </button>
+        </div>
+      </nav>
+      <main className="flex-grow bg-gray-100 p-6">
+        <header className="mb-6">
+          <h1 className="text-5xl font-bold text-center">TODO APPLICATION</h1>
+        </header>
+        <div className="text-center">
+          <p className="text-lg">Welcome to your TODO application!</p>
+        </div>
+  
+    <div className="flex items-center justify-center  bg-gray-100">
       <div className="bg-white shadow-lg rounded-lg p-6 border-t-4 border-green-400 w-96">
         <h1 className="text-2xl font-semibold text-center mb-4">Create New Task</h1>
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
@@ -128,6 +165,7 @@ export default function CreateTask() {
         </form>
       </div>
     </div>
-
+    </main>
+    </div>
   );
 }

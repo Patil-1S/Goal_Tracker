@@ -42,12 +42,12 @@ export default function TaskList() {
     if (!user) {
       router.push('/login');
     } else {
-      setAuthLoading(false); // User is authenticated
+      setAuthLoading(false);
     }
   }, [router]);
 
   useEffect(() => {
-    if (authLoading) return; // Skip API call if still checking authentication
+    if (authLoading) return;
 
     const fetchTasks = async () => {
       setLoading(true);
@@ -85,7 +85,6 @@ export default function TaskList() {
     }
   };
 
-  // Show nothing or a loading indicator while checking authentication
   if (authLoading) {
     return <div className="text-center p-5"></div>;
   }
