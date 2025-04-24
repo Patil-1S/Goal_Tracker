@@ -1,22 +1,20 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { ValidationPipe, BadRequestException } from '@nestjs/common';
+import { BadRequestException, ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   app.enableCors({
-    origin: 'http://localhost:3001',
+    origin: ['http://localhost:3001','http://localhost:3002'],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,
   });
-
-  // Enable validation globally
   app.useGlobalPipes(
     new ValidationPipe({
-      transform: true, // Automatically transform payloads to DTO instances
-      whitelist: true, // Strip properties that do not have any decorators
-      forbidNonWhitelisted: true, // Throw an error if non-whitelisted properties are present
+      transform: true,
+      whitelist: true,
+      forbidNonWhitelisted: true,
       exceptionFactory: (errors) => {
         const messages = errors.map((err) => {
           return Object.values(err.constraints).join(', ');
@@ -25,6 +23,6 @@ async function bootstrap() {
       },
     }),
   );
-  await app.listen(3000);
+  await app.listen(process.env.PORT ?? 3000);
 }
 bootstrap();

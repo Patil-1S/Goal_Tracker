@@ -1,31 +1,40 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { UsersModule } from './users/users.module';
-import { TasksModule } from './tasks/tasks.module';
-import { BaseModelModule } from './base-model/base-model.module';
-import { TypeOrmModule } from '@nestjs/typeorm';
 import * as dotenv from 'dotenv';
-import { User } from './users/entities/user.entity';
-import { Task } from './tasks/entities/task.entity';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { GoalsModule } from './goals/goals.module';
+import { UserModule } from './user/user.module';
+import { AuthModule } from './auth/auth.module';
+import { ConfigModule } from '@nestjs/config';
 
-dotenv.config();
+dotenv.config({
+  path: `${process.cwd()}/envs/.env.${process.env.NODE_ENV || 'dev'}`,
+});
 
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: [
+        `${process.cwd()}/envs/.env.${process.env.NODE_ENV || 'dev'}`,
+      ],
+    }),
     TypeOrmModule.forRoot({
       type: 'postgres',
-      host: process.env.HOST,
-      port: parseInt(process.env.PORT),
-      username: process.env.DB_USER_NAME,
-      password: process.env.DB_PASSWORD,
-      database: process.env.DB_NAME,
-      entities: [User, Task],
-      synchronize: true,
+      host: `${process.env.POSTGRES_HOST}`,
+      port: +`${process.env.POSTGRES_PORT || '5432'}`,
+      username: `${process.env.POSTGRES_USERNAME}`,
+      password: `${process.env.POSTGRES_PASSWORD}`,
+      database: `${process.env.POSTGRES_DATABASE}`,
+      entities: [__dirname + '/../**/*.entity{.ts,.js}'],
+      migrations: [__dirname + '/../migrations/*{.ts,.js}'],
+      synchronize: process.env.DB_SYNC === 'false',
     }),
-    UsersModule,
-    TasksModule,
-    BaseModelModule,
+    UserModule,
+    GoalsModule,
+    UserModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],
